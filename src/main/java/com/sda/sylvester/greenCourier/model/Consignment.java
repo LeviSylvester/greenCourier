@@ -72,5 +72,4 @@ public class Consignment {
                 ", terminus='" + terminus + '\'' +
                 '}';
     }
-
 }

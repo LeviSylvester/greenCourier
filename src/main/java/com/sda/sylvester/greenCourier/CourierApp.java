@@ -7,5 +7,4 @@ public class CourierApp extends CourierView {
     public static void main(String[] args) {
         CourierView.launch();
     }
-
 }

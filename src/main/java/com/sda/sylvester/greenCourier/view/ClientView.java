@@ -74,5 +74,4 @@ public class ClientView extends Application {
 
         clientPlaceOrderVBox.getChildren().addAll(clientWelcomeText, fromHBox, toHBox, termHBox, orderButton);
     }
-
 }

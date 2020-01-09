@@ -10,5 +10,4 @@ public class ConsignmentSaveService {
     public void saveConsignment(Consignment consignment){
         consignmentDao.save(consignment);
     }
-
 }

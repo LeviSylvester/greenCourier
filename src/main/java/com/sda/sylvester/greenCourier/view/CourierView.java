@@ -6,17 +6,18 @@ import com.sda.sylvester.greenCourier.service.ConsignmentSaveService;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.scene.Scene;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,22 +25,20 @@ public class CourierView extends Application {
 
     private static VBox courierVBox = new VBox();
     private static ConsignmentDisplayService consignmentDisplayService = new ConsignmentDisplayService();
-    private static ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
     private static ObservableList<Consignment> consignmentsObservableList =
             FXCollections.observableArrayList(consignmentDisplayService.getAllConsignments());
+    private static ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
     private static Label courierOrdersTableViewLabel = new Label("Orders");
     private static Button refreshButton = new Button("Refresh");
-    private static Button autoRefreshButton = new Button("Auto-refr.->not responding");
-    private static HBox refreshButtonsHBox = new HBox();
     private static TableView<Consignment> courierOrdersTableView = new TableView<>();
     private static TableColumn fromColumn = new TableColumn("From");
     private static TableColumn toColumn = new TableColumn("To");
     private static TableColumn termColumn = new TableColumn("Term");
     private static HBox courierAddOrderHBox = new HBox();
-    private static boolean autoRefresh = false;
+    private static boolean autoRefresh = true;
 
     @Override
-    public void start(Stage courierStage) {
+    public void start(Stage courierStage) throws Exception {
         courierStage.setTitle("BikeCourier");
         courierStage.setWidth(360);
         courierStage.setHeight(640);
@@ -47,14 +46,22 @@ public class CourierView extends Application {
         courierStage.setY(64);
 
         buildRefreshButton();
-        buildAutoRefreshButton();
         buildCourierOrdersTable();
         buildCourierAddOrderHBox();
         buildCourierPhoneAppSimulation();
 
+        Task autoRefreshTask = createAutoRefreshTask();
+
         Scene courierScene = new Scene(courierVBox);
         courierStage.setScene(courierScene);
         courierStage.show();
+
+        new Thread(autoRefreshTask).start();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        autoRefresh = false;
     }
 
     private static void buildCourierOrdersTable() {
@@ -106,15 +113,6 @@ public class CourierView extends Application {
                 }
         );
 
-//        consignmentsObservableList.addListener(new ListChangeListener<Consignment>() {
-//            @Override
-//            public void onChanged(Change consignmentRows) {
-//                while (consignmentRows.next()) {
-//                    System.out.println("-observableList's listener active, toDo: add listener/trigger(?) to db");
-//                }
-//            }
-//        });
-
         courierOrdersTableView.setItems(consignmentsObservableList);
         courierOrdersTableView.getColumns().addAll(fromColumn, toColumn, termColumn);
     }
@@ -155,17 +153,7 @@ public class CourierView extends Application {
         });
     }
 
-    private static void buildAutoRefreshButton() {
-        autoRefreshButton.setOnMouseClicked(event -> {
-            autoRefresh = !autoRefresh;
-            while (autoRefresh) {
-                refreshButton.fire();
-                waitSeconds(5);
-            }
-        });
-    }
-
-    private static void refreshConsignmentsObservableList() {
+    protected static void refreshConsignmentsObservableList() {
         consignmentsObservableList.setAll(consignmentDisplayService.getAllConsignments());
     }
 
@@ -179,15 +167,25 @@ public class CourierView extends Application {
     }
 
     private void buildCourierPhoneAppSimulation() {
-        refreshButtonsHBox.getChildren().addAll(refreshButton, autoRefreshButton);
-        refreshButtonsHBox.setSpacing(3);
         courierVBox.setSpacing(5);
         courierVBox.setPadding(new Insets(10, 11, 0, 11));
         courierVBox.getChildren().addAll(
                 courierOrdersTableViewLabel,
-                refreshButtonsHBox,
+                refreshButton,
                 courierOrdersTableView,
                 courierAddOrderHBox);
     }
 
+    private Task createAutoRefreshTask() {
+        return new Task() {
+            @Override
+            public String call() throws Exception {
+                while (autoRefresh) {
+                    waitSeconds(5);
+                    refreshConsignmentsObservableList();
+                }
+                return "refreshing consignments";
+            }
+        };
+    }
 }
