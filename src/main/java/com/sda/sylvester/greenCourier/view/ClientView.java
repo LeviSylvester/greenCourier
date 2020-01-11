@@ -1,7 +1,9 @@
 package com.sda.sylvester.greenCourier.view;
 
 import com.sda.sylvester.greenCourier.model.Consignment;
+import com.sda.sylvester.greenCourier.model.Status;
 import com.sda.sylvester.greenCourier.service.ConsignmentSaveService;
+import com.sda.sylvester.greenCourier.service.IllegalOperationException;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -65,11 +67,16 @@ public class ClientView extends Application {
             consignment.setConsigner(fromTextField.getText());
             consignment.setConsignee(toTextField.getText());
             consignment.setTerminus(termTextField.getText());
+            consignment.setStatus(Status.AWAITING_RESPONSE);
             fromTextField.clear();
             toTextField.clear();
             termTextField.clear();
             ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
-            consignmentSaveService.saveConsignment(consignment);
+            try{
+            consignmentSaveService.saveConsignment(consignment);}
+            catch (IllegalOperationException exception){
+                clientVBox.getChildren().add(new Label("Unable to place order, try again!"));
+            }
         });
 
         HBox fromHBox = new HBox();

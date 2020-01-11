@@ -14,6 +14,7 @@ public class Consignment {
     private String consigner;
     private String consignee;
     private String terminus;
+    private Status status;
 
     public Consignment() {
     }
@@ -24,11 +25,12 @@ public class Consignment {
         this.terminus = terminus;
     }
 
-    public Consignment(int idConsignment, String consigner, String consignee, String terminus) {
+    public Consignment(int idConsignment, String consigner, String consignee, String terminus, Status status) {
         this.idConsignment = idConsignment;
         this.consigner = consigner;
         this.consignee = consignee;
         this.terminus = terminus;
+        this.status = status;
     }
 
     public int getIdConsignment() {
@@ -63,6 +65,14 @@ public class Consignment {
         this.terminus = terminus;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Consignment{" +
@@ -70,6 +80,7 @@ public class Consignment {
                 ", consigner='" + consigner + '\'' +
                 ", consignee='" + consignee + '\'' +
                 ", terminus='" + terminus + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

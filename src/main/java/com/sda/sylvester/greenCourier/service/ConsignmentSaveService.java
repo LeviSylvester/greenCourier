@@ -7,7 +7,11 @@ public class ConsignmentSaveService {
 
     private ConsignmentDao consignmentDao = new ConsignmentDao();
 
-    public void saveConsignment(Consignment consignment){
-        consignmentDao.save(consignment);
+    public void saveConsignment(Consignment consignment) throws IllegalOperationException {
+        try {
+            consignmentDao.save(consignment);
+        } catch (Exception exception) {
+            throw new IllegalOperationException("Failed to save consignment", exception);
+        }
     }
 }

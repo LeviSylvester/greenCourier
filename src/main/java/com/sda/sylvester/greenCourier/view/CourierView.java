@@ -1,8 +1,11 @@
 package com.sda.sylvester.greenCourier.view;
 
 import com.sda.sylvester.greenCourier.model.Consignment;
+import com.sda.sylvester.greenCourier.model.Status;
+import com.sda.sylvester.greenCourier.service.ConsignmentDisplayService;
 import com.sda.sylvester.greenCourier.service.ConsignmentSaveService;
 import com.sda.sylvester.greenCourier.service.CourierViewService;
+import com.sda.sylvester.greenCourier.service.IllegalOperationException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
@@ -24,7 +28,9 @@ import javafx.scene.text.Font;
 
 public class CourierView extends Application {
 
+    private static ConsignmentDisplayService consignmentDisplayService = new ConsignmentDisplayService();
     private static ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
+    private static Consignment selectedConsignment;
 
     private static VBox courierVBox = new VBox();
     private static Label courierOrdersTableViewLabel = new Label("Orders");
@@ -38,13 +44,19 @@ public class CourierView extends Application {
     public static ObservableList<Consignment> consignmentsObservableList =
             FXCollections.observableArrayList();
 
+    private static HBox selectedOrderHBox = new HBox();
+    private static Label selectedOrderLabel = new Label("Selected: ");
+    private static Label from = new Label();
+    private static Label to = new Label();
+    private static Label term = new Label();
+    private static Button okButton = new Button("Ok");
+
     private static HBox observationsHBox = new HBox();
     private static Label observationsLabel = new Label("Observations: ");
     private static TextField observationsTextField = new TextField();
     private static Button sendButton = new Button("Send");
 
     private static Button statistics = new Button("Statistics");
-
 
     @Override
     public void start(Stage courierStage) throws Exception {
@@ -56,6 +68,7 @@ public class CourierView extends Application {
 
         buildRefreshButton();
         buildCourierOrdersTable();
+        buildSelectedOrderHBox();
         buildCourierAddOrderHBox();
         buildCourierPhoneAppSimulation();
 
@@ -139,10 +152,15 @@ public class CourierView extends Application {
         addOrderButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                consignmentSaveService.saveConsignment(new Consignment(
-                        fromTextField.getText(),
-                        toTextField.getText(),
-                        termTextField.getText()));
+                try {
+                    consignmentSaveService.saveConsignment(new Consignment(
+                            fromTextField.getText(),
+                            toTextField.getText(),
+                            termTextField.getText()));
+                } catch (IllegalOperationException exception){
+                    System.out.println("Unable to save consignment");
+                    courierVBox.getChildren().add(new Label("Unable to save order, try again!"));
+                }
                 fromTextField.clear();
                 toTextField.clear();
                 termTextField.clear();
@@ -154,6 +172,55 @@ public class CourierView extends Application {
                 fromTextField, toTextField, termTextField, addOrderButton
         );
         courierAddOrderHBox.setSpacing(3);
+    }
+
+    private static void observeAndCompleteSelectedOrder(){
+        courierOrdersTableView.getSelectionModel().selectedItemProperty().
+                addListener((obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        selectedConsignment = newSelection;
+                        from.setText(selectedConsignment.getConsigner());
+                        from.setTextFill(Color.RED);
+                        to.setText(selectedConsignment.getConsignee());
+                        to.setTextFill(Color.RED);
+                        term.setText(selectedConsignment.getTerminus());
+                        term.setTextFill(Color.RED);
+                    }
+                });
+    }
+
+    private static void makeOkButtonToAcceptOrder() {
+        okButton.setOnAction(event -> {
+            try {
+                if(consignmentDisplayService.getConsignment(selectedConsignment.getIdConsignment()).
+                        getStatus().equals(Status.AWAITING_RESPONSE))
+                {
+                    selectedConsignment.setStatus(Status.COURIER_OFFERED);
+                    consignmentSaveService.saveConsignment(selectedConsignment);
+                } else {
+                    System.out.println("Unable to set consignment status");
+                    throw new IllegalOperationException("Unable to set consignment status");
+                }
+            } catch (IllegalOperationException exception) {
+                from.setText("");
+                to.setText("");
+                term.setText("");
+                courierVBox.getChildren().add(new Label("Someone took the order already."));
+            } finally {
+                //see what makes sense to do finally
+            }
+        });
+    }
+
+    private static void buildSelectedOrderHBox() {
+        from.setMinWidth(80);
+        to.setMinWidth(80);
+        term.setMinWidth(80);
+
+        observeAndCompleteSelectedOrder();
+        makeOkButtonToAcceptOrder();
+
+        selectedOrderHBox.getChildren().addAll(selectedOrderLabel, from, to, term, okButton);
     }
 
     private static void buildRefreshButton() {
@@ -173,6 +240,7 @@ public class CourierView extends Application {
                 courierOrdersTableViewLabel,
                 refreshButton,
                 courierOrdersTableView,
+                selectedOrderHBox,
                 courierAddOrderHBox,
                 observationsHBox,
                 statistics);
