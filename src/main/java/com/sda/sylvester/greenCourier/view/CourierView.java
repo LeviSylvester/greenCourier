@@ -1,45 +1,54 @@
 package com.sda.sylvester.greenCourier.view;
 
 import com.sda.sylvester.greenCourier.model.Consignment;
-import com.sda.sylvester.greenCourier.service.ConsignmentDisplayService;
 import com.sda.sylvester.greenCourier.service.ConsignmentSaveService;
+import com.sda.sylvester.greenCourier.service.CourierViewService;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-
-import java.util.concurrent.TimeUnit;
 
 public class CourierView extends Application {
 
-    private static VBox courierVBox = new VBox();
-    private static ConsignmentDisplayService consignmentDisplayService = new ConsignmentDisplayService();
-    private static ObservableList<Consignment> consignmentsObservableList =
-            FXCollections.observableArrayList(consignmentDisplayService.getAllConsignments());
     private static ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
+
+    private static VBox courierVBox = new VBox();
     private static Label courierOrdersTableViewLabel = new Label("Orders");
-    private static Button refreshButton = new Button("Refresh");
     private static TableView<Consignment> courierOrdersTableView = new TableView<>();
     private static TableColumn fromColumn = new TableColumn("From");
     private static TableColumn toColumn = new TableColumn("To");
     private static TableColumn termColumn = new TableColumn("Term");
     private static HBox courierAddOrderHBox = new HBox();
-    private static boolean autoRefresh = true;
+    private static Button refreshButton = new Button("Refresh");
+    public static boolean autoRefresh = true;
+    public static ObservableList<Consignment> consignmentsObservableList =
+            FXCollections.observableArrayList();
+
+    private static HBox observationsHBox = new HBox();
+    private static Label observationsLabel = new Label("Observations: ");
+    private static TextField observationsTextField = new TextField();
+    private static Button sendButton = new Button("Send");
+
+    private static Button statistics = new Button("Statistics");
+
 
     @Override
     public void start(Stage courierStage) throws Exception {
-        courierStage.setTitle("BikeCourier");
+        courierStage.setTitle("Green Courier");
         courierStage.setWidth(360);
         courierStage.setHeight(640);
         courierStage.setX(790);
@@ -50,13 +59,11 @@ public class CourierView extends Application {
         buildCourierAddOrderHBox();
         buildCourierPhoneAppSimulation();
 
-        Task autoRefreshTask = createAutoRefreshTask();
-
         Scene courierScene = new Scene(courierVBox);
         courierStage.setScene(courierScene);
         courierStage.show();
 
-        new Thread(autoRefreshTask).start();
+        new Thread(CourierViewService.consignmentsAutoRefreshTask()).start();
     }
 
     @Override
@@ -139,53 +146,35 @@ public class CourierView extends Application {
                 fromTextField.clear();
                 toTextField.clear();
                 termTextField.clear();
-                refreshConsignmentsObservableList();
+                CourierViewService.refreshConsignmentsObservableList();
             }
         });
 
-        courierAddOrderHBox.getChildren().addAll(fromTextField, toTextField, termTextField, addOrderButton);
+        courierAddOrderHBox.getChildren().addAll(
+                fromTextField, toTextField, termTextField, addOrderButton
+        );
         courierAddOrderHBox.setSpacing(3);
     }
 
     private static void buildRefreshButton() {
         refreshButton.setOnAction(event -> {
-            refreshConsignmentsObservableList();
+            CourierViewService.refreshConsignmentsObservableList();
         });
     }
 
-    protected static void refreshConsignmentsObservableList() {
-        consignmentsObservableList.setAll(consignmentDisplayService.getAllConsignments());
-    }
-
-    private static void waitSeconds(int unit) {
-        try {
-//            Thread.sleep(unit*1000);
-            TimeUnit.SECONDS.sleep(unit);
-        } catch (InterruptedException s) {
-            System.out.println("slept " + unit + " sec");
-        }
-    }
-
     private void buildCourierPhoneAppSimulation() {
+        observationsHBox.getChildren().addAll(observationsLabel, observationsTextField, sendButton);
+        observationsHBox.setAlignment(Pos.CENTER);
+        courierVBox.setBackground(new Background(new BackgroundFill(
+                Paint.valueOf("#6B8779"), CornerRadii.EMPTY, Insets.EMPTY)));
         courierVBox.setSpacing(5);
         courierVBox.setPadding(new Insets(10, 11, 0, 11));
         courierVBox.getChildren().addAll(
                 courierOrdersTableViewLabel,
                 refreshButton,
                 courierOrdersTableView,
-                courierAddOrderHBox);
-    }
-
-    private Task createAutoRefreshTask() {
-        return new Task() {
-            @Override
-            public String call() throws Exception {
-                while (autoRefresh) {
-                    waitSeconds(5);
-                    refreshConsignmentsObservableList();
-                }
-                return "refreshing consignments";
-            }
-        };
+                courierAddOrderHBox,
+                observationsHBox,
+                statistics);
     }
 }

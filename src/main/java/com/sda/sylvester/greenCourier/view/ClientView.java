@@ -7,8 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -16,26 +15,37 @@ import javafx.stage.Stage;
 
 public class ClientView extends Application {
 
-    private final VBox clientPlaceOrderVBox = new VBox();
+    private final VBox clientVBox = new VBox();
+    private static Button acceptButton = new Button("Accept");
+    private static HBox observationsHBox = new HBox();
+    private static Label observationsLabel = new Label("Observations: ");
+    private static TextField observationsTextField = new TextField();
+    private static Button sendButton = new Button("Send");
+
+    private static HBox trackDeliveryHBox = new HBox();
+    private static Label trackDeliveryLabel = new Label("Order no.: ");
+    private static TextField orderNumberTextField = new TextField();
+    private static Button trackButton = new Button("Track");
+
+    private static Button historyButton = new Button("History");
 
     @Override
     public void start(Stage clientStage) throws Exception {
-        clientStage.setTitle("BikeCourier");
+        clientStage.setTitle("Green Courier");
         clientStage.setHeight(640);
         clientStage.setWidth(360);
         clientStage.setX(215);
         clientStage.setY(64);
 
-        buildClientPhoneAppSimulation(clientPlaceOrderVBox);
-
-        Scene clientScene = new Scene(clientPlaceOrderVBox);
+        buildClientPhoneAppSimulation();
+        Scene clientScene = new Scene(clientVBox);
         clientStage.setScene(clientScene);
         clientStage.show();
     }
 
-    private void buildClientPhoneAppSimulation(VBox clientPlaceOrderVBox) {
-        clientPlaceOrderVBox.setAlignment(Pos.CENTER);
-        clientPlaceOrderVBox.setSpacing(10);
+    private void buildClientPhoneAppSimulation() {
+        clientVBox.setAlignment(Pos.CENTER);
+        clientVBox.setSpacing(10);
 
         Text clientWelcomeText = new Text("Order a courier");
         clientWelcomeText.setFont(Font.font("Veranda", 30));
@@ -72,6 +82,23 @@ public class ClientView extends Application {
         termHBox.getChildren().addAll(termLabel, termTextField);
         termHBox.setAlignment(Pos.CENTER);
 
-        clientPlaceOrderVBox.getChildren().addAll(clientWelcomeText, fromHBox, toHBox, termHBox, orderButton);
+        observationsHBox.getChildren().addAll(observationsLabel, observationsTextField, sendButton);
+        observationsHBox.setAlignment(Pos.CENTER);
+        trackDeliveryHBox.getChildren().addAll(trackDeliveryLabel, orderNumberTextField, trackButton);
+        trackDeliveryHBox.setAlignment(Pos.CENTER);
+        clientVBox.setBackground(new Background(new BackgroundFill(
+                Paint.valueOf("#6B8779"), CornerRadii.EMPTY, Insets.EMPTY
+        )));
+        clientVBox.getChildren().addAll(
+                clientWelcomeText,
+                fromHBox,
+                toHBox,
+                termHBox,
+                orderButton,
+                acceptButton,
+                observationsHBox,
+                trackDeliveryHBox,
+                historyButton
+                );
     }
 }
