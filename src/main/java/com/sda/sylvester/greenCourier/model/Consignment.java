@@ -15,6 +15,7 @@ public class Consignment {
     private String consignee;
     private String terminus;
     private Status status;
+    private String observations;
 
     public Consignment() {
     }
@@ -23,6 +24,13 @@ public class Consignment {
         this.consigner = consigner;
         this.consignee = consignee;
         this.terminus = terminus;
+    }
+
+    public Consignment(String consigner, String consignee, String terminus, String observations) {
+        this.consigner = consigner;
+        this.consignee = consignee;
+        this.terminus = terminus;
+        this.observations = observations;
     }
 
     public Consignment(int idConsignment, String consigner, String consignee, String terminus, Status status) {
@@ -71,6 +79,14 @@ public class Consignment {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 
     @Override

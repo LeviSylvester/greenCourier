@@ -2,6 +2,7 @@ package com.sda.sylvester.greenCourier.view;
 
 import com.sda.sylvester.greenCourier.model.Consignment;
 import com.sda.sylvester.greenCourier.model.Status;
+import com.sda.sylvester.greenCourier.service.ConsignmentRefreshService;
 import com.sda.sylvester.greenCourier.service.ConsignmentSaveService;
 import com.sda.sylvester.greenCourier.service.IllegalOperationException;
 import javafx.application.Application;
@@ -17,19 +18,32 @@ import javafx.stage.Stage;
 
 public class ClientView extends Application {
 
-    private final VBox clientVBox = new VBox();
-    private static Button acceptButton = new Button("Accept");
+    private static ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
+    private static Consignment consignment = new Consignment();
+
+    private static VBox clientVBox = new VBox();
+
+    private static TextField fromTextField = new TextField();
+    private static TextField toTextField = new TextField();
+    private static TextField termTextField = new TextField();
+    private static Button orderButton = new Button("Place order");
+
     private static HBox observationsHBox = new HBox();
     private static Label observationsLabel = new Label("Observations: ");
+
     private static TextField observationsTextField = new TextField();
     private static Button sendButton = new Button("Send");
 
     private static HBox trackDeliveryHBox = new HBox();
     private static Label trackDeliveryLabel = new Label("Order no.: ");
-    private static TextField orderNumberTextField = new TextField();
+    private static TextField orderNumberAndStatusTextField = new TextField();
     private static Button trackButton = new Button("Track");
+    private static Button acceptButton = new Button("Accept");
 
     private static Button historyButton = new Button("History");
+
+    public static int currentOrderNumber;
+    public static boolean clientAutoRefresh = false;
 
     @Override
     public void start(Stage clientStage) throws Exception {
@@ -45,6 +59,50 @@ public class ClientView extends Application {
         clientStage.show();
     }
 
+    public static void setConsignment(Consignment consignment) {
+        ClientView.consignment = consignment;
+    }
+
+    public static void setObservationsTextField(String observations) {
+        ClientView.observationsTextField.setText(observations);
+    }
+
+    private static void orderButtonPlacingOrder() {
+        orderButton.setOnMouseClicked(event -> {
+            consignment.setConsigner(fromTextField.getText());
+            consignment.setConsignee(toTextField.getText());
+            consignment.setTerminus(termTextField.getText());
+            consignment.setStatus(Status.AWAITING_RESPONSE);
+            consignment.setObservations(observationsTextField.getText());
+            fromTextField.clear();
+            toTextField.clear();
+            termTextField.clear();
+            try {
+                consignment = consignmentSaveService.saveConsignment(consignment);
+                currentOrderNumber = consignment.getIdConsignment();
+                setStatusInOrderTrackingTextBox(currentOrderNumber, " - Awaiting response...");
+                clientAutoRefresh = true;
+                new Thread(ConsignmentRefreshService.placedOrderAutoRefreshTask()).start();
+            } catch (IllegalOperationException exception) {
+                clientVBox.getChildren().add(new Label("Unable to place order, try again!"));
+            }
+        });
+    }
+
+    public static void acceptButtonClosingDeal() {
+        acceptButton.setOnAction(event -> {
+            try {
+                consignmentSaveService.closeDeal(consignment);
+            } catch (IllegalOperationException e) {
+                System.out.println("Database error occurred, please try again!");
+            }
+        });
+    }
+
+    public static void setStatusInOrderTrackingTextBox(int currentOrderNumber, String status) {
+        orderNumberAndStatusTextField.setText(currentOrderNumber + status);
+    }
+
     private void buildClientPhoneAppSimulation() {
         clientVBox.setAlignment(Pos.CENTER);
         clientVBox.setSpacing(10);
@@ -54,30 +112,12 @@ public class ClientView extends Application {
         clientWelcomeText.setFill(Paint.valueOf("#2455d1"));
 
         Label fromLabel = new Label("From: ");
-        TextField fromTextField = new TextField();
         Label toLabel = new Label("To: ");
-        toLabel.setPadding(new Insets(0,0,0, 14));
-        TextField toTextField = new TextField();
+        toLabel.setPadding(new Insets(0, 0, 0, 14));
         Label termLabel = new Label("Term: ");
-        TextField termTextField = new TextField();
 
-        Button orderButton = new Button("Place order");
-        orderButton.setOnMouseClicked(event -> {
-            Consignment consignment = new Consignment();
-            consignment.setConsigner(fromTextField.getText());
-            consignment.setConsignee(toTextField.getText());
-            consignment.setTerminus(termTextField.getText());
-            consignment.setStatus(Status.AWAITING_RESPONSE);
-            fromTextField.clear();
-            toTextField.clear();
-            termTextField.clear();
-            ConsignmentSaveService consignmentSaveService = new ConsignmentSaveService();
-            try{
-            consignmentSaveService.saveConsignment(consignment);}
-            catch (IllegalOperationException exception){
-                clientVBox.getChildren().add(new Label("Unable to place order, try again!"));
-            }
-        });
+        orderButtonPlacingOrder();
+        acceptButtonClosingDeal();
 
         HBox fromHBox = new HBox();
         fromHBox.getChildren().addAll(fromLabel, fromTextField);
@@ -91,7 +131,7 @@ public class ClientView extends Application {
 
         observationsHBox.getChildren().addAll(observationsLabel, observationsTextField, sendButton);
         observationsHBox.setAlignment(Pos.CENTER);
-        trackDeliveryHBox.getChildren().addAll(trackDeliveryLabel, orderNumberTextField, trackButton);
+        trackDeliveryHBox.getChildren().addAll(trackDeliveryLabel, orderNumberAndStatusTextField, trackButton);
         trackDeliveryHBox.setAlignment(Pos.CENTER);
         clientVBox.setBackground(new Background(new BackgroundFill(
                 Paint.valueOf("#6B8779"), CornerRadii.EMPTY, Insets.EMPTY
@@ -102,10 +142,10 @@ public class ClientView extends Application {
                 toHBox,
                 termHBox,
                 orderButton,
-                acceptButton,
                 observationsHBox,
                 trackDeliveryHBox,
+                acceptButton,
                 historyButton
-                );
+        );
     }
 }
