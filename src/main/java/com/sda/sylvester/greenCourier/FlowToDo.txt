@@ -1,0 +1,120 @@
+Done:
+-write models
+-make tables in mysql
+-set HibernateUtil
+-impl. dao
+-basic service classes
+-make basic client an courier views
+-impl. basic functionalities
+-make client place-order to set the status of the order to awaiting response
+-implement accepting order for courier
+-make ok-button to accept order in courierView
+-make method in ConsignmentDao for modifying a consignment's status by it's number
+-colour selected order to red
+-make empty selectedConsignmentHBox
+-indent elements of VBox higher in client
+-delete from db the empty row
+-separate view only elements and elements with functionality
+-separate CourierView to CourierView, CourierApp and CourierUtil
+-paint to a dark colour the background of the two apps [black-white-green]
+-order inputs by relevance in courierView's 3 build-methods
+-make statuses: awaitingResponse, courierOffered, clientAccepted, awaitingDelivery, inDelivery, Delivered
+-move courierView1 and 2 to stash
+-initialize in init the second thread as last line of start method
+-try autoMultiThreading in javafx
+-leave for now the database trigger, use refresh method wherever you must
+-implement functionalities, make them with methods directly, if that doesn't work extract methods at the end
+-extract server-parts
+-add observations in client
+-add observations in courier
+-make courier chatHBox [that's the observationsHBox for now]
+-make client chatHBox [that's the observationsHBox for now]
+-set the mysql concurrency setting to negotiate consignmentId number
+ if two consignments are entered the same time [using transaction at ConsignmentSaveDao takes care of that]
+-setOnMouseClicked row/cell display in selectedOrderHBox
+-add field status to Consignment
+-make a statusColumn
+-statusColumn getStatus
+-extract buildClientPhoneAppSimulation method
+-implement agreement process
+-set initial status in client
+-rename CourierViewService to ConsignmentRefreshService
+-make a selectedOrderHBox for courier, accomplishing feedback
+-make a refresh button in client [that's the track button for]
+-auto-refresh textField and if status has been modified to courier_offered, modify it accordingly
+-give feedback to the user of what just happened or is happening
+-delivery tracking system e.g. enter order no. -> display delivery status [done in agreement process]
+-preserve auto-refreshed list selection e.g. before auto-refresh get selection, after auto-refresh set selection
+-agree on colours based on order status for courier's order list
+ [red-awaiting response, purple-courier offered, green-client accepted,
+ dark red-awaiting delivery, dark purple-in delivery, grey-delivered]
+-insert a feedback for courier's selected and offered order,
+ like colour to purple when ok button is pressed and colour to green when client accepted
+-see what makes sense to do finally in makeOkButtonToAcceptOrder method and implement it [reactivate selection in table]
+-modify "Accepted, please wait..." to " - Awaiting delivery."
+-set public fields to private and insert getters/setters
+-in courier refocus table-view as last line/s of code in pressing ok-button method
+-solve table-view focus problem by save selection - refresh - set selection only (without focus)
+-add observations max n characters to order in database [text(65380)]
+-add observations field, constructor, getter & setter in Consignment
+-send an observation with send button
+ -initialize from-to-term textFields and orderButton as private static fields
+ -extract orderButtonPlaceOrder method
+ -save and preserve client observationsTextField
+ -preserve and save courier ObservationsTextField
+
+ToDo:
+-impl. communication between client and courier observationTextFields through db
+-read how to do chat-snippet
+-learn how to activate or deactivate button and think about impl. it on ok button
+ if an order's status is already courier offered
+-make a message HBox for further error messages and such
+-read how to make a vertically wider text-field in javafx
+-place caret on end of text in courier's observations
+-set track button to refresh order status
+-arrange error message in right of statistics
+-forEach order from list colour by status
+-read how to startup another window in current window (then back button) for history and statistics
+-experiment with commit-modify-revert
+-experiment with stash (read how to and apply it)
+
+Ideas:
+-run the thread on startup and modify it on the run, for not freezing in view when starting up
+-in closeDeal method a counter should start till courier arrives
+-make someone already took the order disappear after a new order had been selected (probably in select order method)
+-make a counter to count down till courier arrives (for client)
+-make picked up button to set status to in delivery (for client)
+-make a setting to set picked up button fire automatically after awaiting delivery time has passed (for client)
+-make a not picked up button to revert automatically picked up button (courier hasn't arrived) ergo awaiting delivery
+-make picked up button to set status to in delivery (if client hasn't set it already)
+-after awaiting delivery time passed, blink red and ask courier to confirm that status is in delivery
+-make a setting to set picked up button fire automatically after awaiting delivery time has passed (for courier)
+-display only my taken orders in courier orders' list and orders awaiting response and colour awaiting response ones
+-make time column
+-add person to consignment
+-add person to database
+-think about making type enum class for a Person table or having different table for Client and Courier
+-think about doing login table with credentials of each courier and client
+-make colouring by colors automatically picked up from map
+-use everything you can from bikeCourier
+-set term a drop-down list of term elements to select or int values
+-don't forget about statistics
+-at the end implement validations wherever you must
+-make filters (labels + checkboxes) of what to display in tableView e.g. awaiting response, where courier is
+-implement tooltip e.g. this person favors that you take extra care of his packet
+-make a login page for client in security package
+-make a login page for courier in security package
+-update apps with person
+-make chat e.g. with logger writing to database
+-make a class to launch both clientView and courierView
+-update the terms with what means urgent
+-write description of the practical project
+-make a readme and put inside all: term, to dos, specsIdeas, description, everything
+-reverse engineer db and put in resources
+-put in an md file the picture of db design
+-use something from the 2 apache commons
+-write tests as you want to implement new functionalities
+-do all txt-s with md file
+-search & if you can, make an exe to start the two apps together for demonstrative purposes
+-make high-contrast version of the app
+-internationalize
