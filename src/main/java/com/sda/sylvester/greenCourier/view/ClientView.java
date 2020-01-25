@@ -65,6 +65,7 @@ public class ClientView extends Application {
 
     public static void setObservationsTextField(String observations) {
         ClientView.observationsTextField.setText(observations);
+        ClientView.observationsTextField.positionCaret(observations.length());
     }
 
     private static void orderButtonPlacingOrder() {

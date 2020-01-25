@@ -35,7 +35,7 @@ public class ConsignmentRefreshService {
             public String call() throws Exception {
                 while (courierAutoRefresh) {
                     refreshConsignmentsObservableList();
-                    focusOnCourierOrdersTableViewSelection();
+                    preserveCourierOrdersTableViewSelection();
                     waitSeconds(5);
                 }
                 return "auto-refreshed consignments";

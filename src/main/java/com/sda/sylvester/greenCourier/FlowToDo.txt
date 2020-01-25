@@ -19,10 +19,11 @@ Done:
 -paint to a dark colour the background of the two apps [black-white-green]
 -order inputs by relevance in courierView's 3 build-methods
 -make statuses: awaitingResponse, courierOffered, clientAccepted, awaitingDelivery, inDelivery, Delivered
+ [clientAccepted = awaitingDelivery, kept the latter]
 -move courierView1 and 2 to stash
 -initialize in init the second thread as last line of start method
 -try autoMultiThreading in javafx
--leave for now the database trigger, use refresh method wherever you must
+-write a task, put the auto-refresh method in the task, start task with thread in start method
 -implement functionalities, make them with methods directly, if that doesn't work extract methods at the end
 -extract server-parts
 -add observations in client
@@ -62,25 +63,26 @@ Done:
  -extract orderButtonPlaceOrder method
  -save and preserve client observationsTextField
  -preserve and save courier ObservationsTextField
+-impl. communication between client and courier observationTextFields through db
+-place caret on end of text in courier's and client's observations
 
 ToDo:
--impl. communication between client and courier observationTextFields through db
+-set track button to refresh order status
 -read how to do chat-snippet
 -learn how to activate or deactivate button and think about impl. it on ok button
  if an order's status is already courier offered
 -make a message HBox for further error messages and such
 -read how to make a vertically wider text-field in javafx
--place caret on end of text in courier's observations
--set track button to refresh order status
 -arrange error message in right of statistics
 -forEach order from list colour by status
 -read how to startup another window in current window (then back button) for history and statistics
 -experiment with commit-modify-revert
 -experiment with stash (read how to and apply it)
+-migrate models back from bikeCourier, update db accordingly
 
 Ideas:
 -run the thread on startup and modify it on the run, for not freezing in view when starting up
--in closeDeal method a counter should start till courier arrives
+-in closeDeal() a counter should start till courier arrives
 -make someone already took the order disappear after a new order had been selected (probably in select order method)
 -make a counter to count down till courier arrives (for client)
 -make picked up button to set status to in delivery (for client)
@@ -93,11 +95,13 @@ Ideas:
 -make time column
 -add person to consignment
 -add person to database
+-try to use a database trigger
 -think about making type enum class for a Person table or having different table for Client and Courier
 -think about doing login table with credentials of each courier and client
 -make colouring by colors automatically picked up from map
 -use everything you can from bikeCourier
 -set term a drop-down list of term elements to select or int values
+-when app is connected to google maps, featurefor observable list to contain only relevant orders to the courier's zone
 -don't forget about statistics
 -at the end implement validations wherever you must
 -make filters (labels + checkboxes) of what to display in tableView e.g. awaiting response, where courier is

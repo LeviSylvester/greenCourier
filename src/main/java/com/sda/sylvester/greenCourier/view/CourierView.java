@@ -94,7 +94,7 @@ public class CourierView extends Application {
         return selectedConsignment;
     }
 
-    public static void focusOnCourierOrdersTableViewSelection() {
+    public static void preserveCourierOrdersTableViewSelection() {
         if (selectedConsignmentBeforeRefresh != null) {
 //            courierOrdersTableView.requestFocus();
             courierOrdersTableView.getSelectionModel().select(selectedRow);
@@ -105,7 +105,7 @@ public class CourierView extends Application {
     private static void buildRefreshButton() {
         refreshButton.setOnAction(event -> {
             ConsignmentRefreshService.refreshConsignmentsObservableList();
-            focusOnCourierOrdersTableViewSelection();
+            preserveCourierOrdersTableViewSelection();
         });
     }
 
@@ -212,6 +212,7 @@ public class CourierView extends Application {
                         to.setText(selectedConsignment.getConsignee());
                         term.setText(selectedConsignment.getTerminus());
                         observationsTextField.setText(selectedConsignment.getObservations());
+                        observationsTextField.positionCaret(observationsTextField.getText().length());
                         Status selectedConsignmentStatus = selectedConsignment.getStatus();
                         if (selectedConsignmentStatus == Status.AWAITING_RESPONSE) {
                             from.setTextFill(Color.RED);
@@ -247,7 +248,7 @@ public class CourierView extends Application {
                 term.setText("");
                 courierVBox.getChildren().add(new Label("Someone took the order already."));
             } finally {
-                focusOnCourierOrdersTableViewSelection();
+                preserveCourierOrdersTableViewSelection();
             }
         });
     }
@@ -263,7 +264,7 @@ public class CourierView extends Application {
         selectedOrderHBox.getChildren().addAll(selectedOrderLabel, from, to, term, okButton);
     }
 
-    private static void sendButtonUpdateObservations() {
+    private static void sendButtonUpdateObservationsInDB() {
         sendButton.setOnAction(event -> {
             if (selectedConsignment != null) {
                 selectedConsignment.setObservations(observationsTextField.getText() + " | ");
@@ -277,7 +278,7 @@ public class CourierView extends Application {
     }
 
     private static void buildObservationsHBox(){
-        sendButtonUpdateObservations();
+        sendButtonUpdateObservationsInDB();
         observationsHBox.getChildren().addAll(observationsLabel, observationsTextField, sendButton);
         observationsHBox.setAlignment(Pos.CENTER);
     }
