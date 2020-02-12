@@ -100,6 +100,8 @@ public class ClientView extends Application {
         });
     }
 
+
+
     public static void setStatusInOrderTrackingTextBox(int currentOrderNumber, String status) {
         orderNumberAndStatusTextField.setText(currentOrderNumber + status);
     }

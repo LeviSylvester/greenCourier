@@ -65,14 +65,16 @@ Done:
  -preserve and save courier ObservationsTextField
 -impl. communication between client and courier observationTextFields through db
 -place caret on end of text in courier's and client's observations
+-ask trainer if should you use Angular now or wait till we finish Spring module [I need Spring in order to use Angular]
 
-ToDo:
+Doing:
 -set track button to refresh order status
 -read how to do chat-snippet
 -learn how to activate or deactivate button and think about impl. it on ok button
  if an order's status is already courier offered
 -make a message HBox for further error messages and such
 -read how to make a vertically wider text-field in javafx
+-then with taller textbox instead of | character use new line character to display messages one after the other
 -arrange error message in right of statistics
 -forEach order from list colour by status
 -read how to startup another window in current window (then back button) for history and statistics
@@ -81,6 +83,7 @@ ToDo:
 -migrate models back from bikeCourier, update db accordingly
 
 Ideas:
+-insert person and another model & dao to project
 -run the thread on startup and modify it on the run, for not freezing in view when starting up
 -in closeDeal() a counter should start till courier arrives
 -make someone already took the order disappear after a new order had been selected (probably in select order method)

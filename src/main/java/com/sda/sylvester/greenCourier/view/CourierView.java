@@ -212,7 +212,10 @@ public class CourierView extends Application {
                         to.setText(selectedConsignment.getConsignee());
                         term.setText(selectedConsignment.getTerminus());
                         observationsTextField.setText(selectedConsignment.getObservations());
-                        observationsTextField.positionCaret(observationsTextField.getText().length());
+                        String observationsTextFieldContent = observationsTextField.getText();
+                        if (observationsTextFieldContent != null) {
+                            observationsTextField.positionCaret(observationsTextFieldContent.length());
+                        }
                         Status selectedConsignmentStatus = selectedConsignment.getStatus();
                         if (selectedConsignmentStatus == Status.AWAITING_RESPONSE) {
                             from.setTextFill(Color.RED);
@@ -277,7 +280,7 @@ public class CourierView extends Application {
         });
     }
 
-    private static void buildObservationsHBox(){
+    private static void buildObservationsHBox() {
         sendButtonUpdateObservationsInDB();
         observationsHBox.getChildren().addAll(observationsLabel, observationsTextField, sendButton);
         observationsHBox.setAlignment(Pos.CENTER);
